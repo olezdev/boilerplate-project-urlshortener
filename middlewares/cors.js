@@ -7,7 +7,7 @@ const ACCEPTED_ORIGINS = [
 
 // enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
 // so that your API is remotely testable by FCC
-export const enableCORS = (req, res, next) => {
+const enableCORS = (req, res, next) => {
   if (!process.env.DISABLE_XORIGIN) {
     // const allowedOrigins = ["https://www.freecodecamp.org"];
     const origin = req.headers.origin;
@@ -23,4 +23,4 @@ export const enableCORS = (req, res, next) => {
   next();
 }
 
-exports.module = { enableCORS }
+module.exports = { enableCORS }
