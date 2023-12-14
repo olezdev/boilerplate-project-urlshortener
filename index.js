@@ -24,6 +24,21 @@ app.get('/api/hello', (req, res) => {
   res.json({ greeting: 'hello API' });
 });
 
+app.get('/api/shorturl/:short_url', (req, res) => {
+  let short_url = parseInt(req.params.short_url)
+  console.log(short_url);
+
+  db.ShortURL.findOne({ short_url: short_url })
+    .then((data) => {
+      console.log(data);
+      res.redirect(data.original_url);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.json({ error: 'Invalid URL' });
+    });
+});
+
 app.post('/api/shorturl', (req, res, next) => {
   const { url } = req.body
   console.log(url);
@@ -55,21 +70,6 @@ app.post('/api/shorturl', (req, res, next) => {
   });
   shortenedURL.push(data);
 
-});
-
-app.get('/api/shorturl/:short_url', (req, res) => {
-  let short_url = parseInt(req.params.short_url)
-  console.log(short_url);
-
-  db.ShortURL.findOne({ short_url: short_url })
-    .then((url) => {
-      console.log(url);
-      res.redirect(url.original_url);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.json({ error: 'Invalid URL' });
-    });
 });
 
 const PORT = process.env.PORT ?? 1234
