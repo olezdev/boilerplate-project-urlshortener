@@ -8,9 +8,6 @@ const shortURLSchema = new mongoose.Schema({
   short_url: Number
 });
 
-const ShortURL = mongoose.model('ShortURL', shortURLSchema);
+let ShortURL = mongoose.model('ShortURL', shortURLSchema);
 
-module.exports = {
-  shortURLSchema,
-  ShortURL
-}
+module.exports = { ShortURL }
