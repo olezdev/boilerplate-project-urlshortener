@@ -1,14 +1,14 @@
 require('dotenv').config();
 const express = require('express');
-// const enableCORS = require('./middlewares/cors');
+const enableCORS = require('./middlewares/cors');
 const app = express();
-const cors = require('cors');
+// const cors = require('cors');
 const dns = require('dns');
 const bodyparser = require('body-parser');
 const db = require('./mongodb.js');
 
 // Basic Configuration
-app.use(cors());
+app.use(enableCORS());
 app.use(bodyparser.json());
 app.use('/public', express.static(`${process.cwd()}/public`));
 
