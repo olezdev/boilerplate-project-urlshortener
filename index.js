@@ -24,8 +24,8 @@ app.get('/api/hello', (req, res) => {
   res.json({ greeting: 'hello API' });
 });
 
-app.get('/api/shorturl/:short_url', (req, res) => {
-  let short_url = parseInt(req.params.short_url)
+app.get('/api/shorturl/:short_url?', (req, res) => {
+  const { short_url } = parseInt(req.params);
   console.log(short_url);
 
   db.ShortURL.findOne({ short_url: short_url })
