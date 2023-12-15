@@ -25,18 +25,24 @@ app.get('/api/hello', (req, res) => {
 });
 
 app.get('/api/shorturl/:short_url?', (req, res) => {
-  const { short_url } = parseInt(req.params);
-  console.log(short_url);
+  const { short_url } = req.params;
+  // console.log(short_url);
+  if (!isNaN(short_url)) {
+    const short_url_int = parseInt(short_url);
 
-  db.ShortURL.findOne({ short_url: short_url })
-    .then((data) => {
-      console.log(data);
-      res.redirect(data.original_url);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.json({ error: 'Invalid URL' });
-    });
+    db.ShortURL.findOne({ short_url: short_url_int }, ((err, data) => {
+      if (data) {
+        console.log(data);
+        res.redirect(data.original_url);
+      } else {
+        console.log(err);
+        res.status(404);
+      }
+    }));
+
+  } else {
+    res.json({ error: 'Wrong format' });
+  }
 });
 
 app.post('/api/shorturl', (req, res, next) => {
@@ -44,6 +50,8 @@ app.post('/api/shorturl', (req, res, next) => {
   console.log(url);
 
   const hostname = new URL(url).hostname;
+
+  console.log(hostname);
 
   dns.lookup(hostname, (err) => {
     if (err) {
