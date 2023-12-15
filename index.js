@@ -27,6 +27,9 @@ app.get('/api/hello', (req, res) => {
 app.get('/api/shorturl/:short_url?', async (req, res) => {
   const { short_url } = req.params;
   // console.log(short_url);
+  if (!short_url || short_url === '') {
+    res.redirect('back');
+  }
   if (!isNaN(short_url)) {
     const short_url_int = parseInt(short_url);
 
@@ -46,15 +49,18 @@ app.get('/api/shorturl/:short_url?', async (req, res) => {
 });
 
 app.post('/api/shorturl', (req, res, next) => {
-  // const { url } = req.body
-  // console.log(url);
+  let host
 
-  const hostname = new URL(req.body.url).hostname;
-  console.log(hostname);
+  try {
+    host = new URL(req.body.url).hostname;
+  } catch (err) {
+    console.log("error is ", err);
+    return res.status(400).json({ error: "invalid url" });
+  }
 
-  dns.lookup(hostname, (err, address) => {
+  dns.lookup(host, (err) => {
     if (err) {
-      res.json({ error: "Invalid URL" });
+      return res.status(400).json({ error: "invalid url" });
     } else {
       next();
     }
