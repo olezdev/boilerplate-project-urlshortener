@@ -50,7 +50,6 @@ app.post('/api/shorturl', (req, res, next) => {
   console.log(url);
 
   const hostname = new URL(url).hostname;
-
   console.log(hostname);
 
   dns.lookup(hostname, (err, address) => {
@@ -61,16 +60,31 @@ app.post('/api/shorturl', (req, res, next) => {
     }
   });
 }, (req, res) => {
-  // Encontrar el máximo ordenando en orden descendente y tomando el primero
-  const short_url_max = db.ShortURL.find().sort({ [short_url]: -1 }).limit(1).toArray();
+  const short_url_last = db.ShortURL
+    .find()
+    .sort({ short_url: -1 })
+    .limit(1)
+    .select({ original_url: 0 })
+    .exec((err, data) => {
+      if (err) {
+        return console.log(err);
+      }
+      return resolve(data);
+    });
+
+  console.log(short_url_last);
+
+  const last_url = short_url_last[0][short_url];
+
+  console.log(last_url);
 
   const data = {
     original_url: req.body.url,
-    short_url: short_url_max + 1
+    short_url: last_url + 1
   };
   let url = new db.ShortURL({
     original_url: req.body.url,
-    short_url: short_url_max + 1
+    short_url: last_url + 1
   });
 
   url.save().then(() => {
