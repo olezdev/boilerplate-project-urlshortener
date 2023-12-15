@@ -9,8 +9,8 @@ const db = require('./mongodb.js');
 
 // Basic Configuration
 app.use(cors());
-app.use(bodyparser.urlencoded({ extended: "false" }));
-app.use(bodyparser.json());
+// app.use(bodyparser.urlencoded({ extended: "false" }));
+// app.use(bodyparser.json());
 app.use('/public', express.static(`${process.cwd()}/public`));
 
 let shortenedURL = []
@@ -47,19 +47,19 @@ app.get('/api/shorturl/:short_url?', async (req, res) => {
   }
 });
 
-app.post('/api/shorturl', (req, res, next) => {
+app.post('/api/shorturl', bodyparser.urlencoded({ extended: "false" }), (req, res, next) => {
   let host
 
   try {
     host = new URL(req.body.url).hostname;
   } catch (err) {
     console.log("error is ", err);
-    return res.status(400).json({ error: "invalid url" });
+    return res.status(400).json({ error: "Invalid URL" });
   }
 
   dns.lookup(host, (err) => {
     if (err) {
-      return res.status(400).json({ error: "invalid url" });
+      return res.status(400).json({ error: "Invalid URL" });
     } else {
       next();
     }
@@ -77,8 +77,6 @@ app.post('/api/shorturl', (req, res, next) => {
     }).catch((err) => {
       return console.log(err);
     });
-  // const last_url = short_url_last[0]["short_url"];
-  // console.log(last_url);
 
   const data = {
     original_url: req.body.url,
