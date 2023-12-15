@@ -34,13 +34,13 @@ app.get('/api/shorturl/:short_url?', (req, res) => {
     const short_url_int = parseInt(short_url);
 
     db.ShortURL.findOne({ short_url: short_url_int })
-      .then((err, data) => {
-        if (err) {
-          console.log(err);
-          return res.status(404);
-        }
-        console.log(data.original_url);
-        res.redirect(data.original_url);
+      .then((url) => {
+        console.log(url.original_url);
+        res.redirect(url.original_url);
+      })
+      .catch((err) => {
+        console.log(err);
+        return res.status(404);
       });
 
   } else {
