@@ -34,13 +34,12 @@ app.get('/api/shorturl/:short_url?', async (req, res) => {
     const short_url_int = parseInt(short_url);
 
     await db.ShortURL.findOne({ short_url: short_url_int }, ((err, data) => {
-      if (data) {
-        console.log(data);
-        res.redirect(data.original_url);
-      } else {
+      if (err) {
         console.log(err);
-        res.status(404);
+        return res.status(404);
       }
+      console.log(data.original_url);
+      res.redirect(data.original_url);
     }));
 
   } else {
@@ -72,9 +71,9 @@ app.post('/api/shorturl', (req, res, next) => {
     .limit(1)
     .select({ original_url: 0 })
     .then((data) => {
-      console.log(data[0]);
+      // console.log(data[0]);
       console.log(data[0]['short_url']);
-      return data[0];
+      return data[0]['short_url'];
     }).catch((err) => {
       return console.log(err);
     });
@@ -83,11 +82,11 @@ app.post('/api/shorturl', (req, res, next) => {
 
   const data = {
     original_url: req.body.url,
-    short_url: shortenedURL.length + 1
+    short_url: short_url_last + 1
   };
   let url = new db.ShortURL({
     original_url: req.body.url,
-    short_url: shortenedURL.length + 1
+    short_url: short_url_last + 1
   });
 
   url.save().then(() => {
