@@ -24,13 +24,13 @@ app.get('/api/hello', (req, res) => {
   res.json({ greeting: 'hello API' });
 });
 
-app.get('/api/shorturl/:short_url?', (req, res) => {
+app.get('/api/shorturl/:short_url?', async (req, res) => {
   const { short_url } = req.params;
   // console.log(short_url);
   if (!isNaN(short_url)) {
     const short_url_int = parseInt(short_url);
 
-    db.ShortURL.findOne({ short_url: short_url_int }, ((err, data) => {
+    await db.ShortURL.findOne({ short_url: short_url_int }, ((err, data) => {
       if (data) {
         console.log(data);
         res.redirect(data.original_url);
@@ -67,7 +67,6 @@ app.post('/api/shorturl', (req, res, next) => {
     .select({ original_url: 0 })
     .then((data) => {
       console.log(data[0]);
-      console.log(data[0][short_url]);
       console.log(data[0]['short_url']);
       return data[0];
     }).catch((err) => {
