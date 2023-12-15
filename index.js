@@ -13,7 +13,7 @@ app.use(bodyparser.urlencoded({ extended: "false" }));
 app.use(bodyparser.json());
 app.use('/public', express.static(`${process.cwd()}/public`));
 
-let shortenedURL = []
+// let shortenedURL = []
 
 app.get('/', (req, res) => {
   res.sendFile(process.cwd() + '/views/index.html');
@@ -53,7 +53,7 @@ app.post('/api/shorturl', (req, res, next) => {
 
   console.log(hostname);
 
-  dns.lookup(hostname, (err) => {
+  dns.lookup(hostname, (err, address) => {
     if (err) {
       res.json({ error: "Invalid URL" });
     } else {
@@ -61,22 +61,27 @@ app.post('/api/shorturl', (req, res, next) => {
     }
   });
 }, (req, res) => {
+  // Encontrar el máximo ordenando en orden descendente y tomando el primero
+  const short_url_max = db.ShortURL.find().sort({ [short_url]: -1 }).limit(1).toArray();
+
   const data = {
     original_url: req.body.url,
-    short_url: shortenedURL.length + 1
+    short_url: short_url_max + 1
   };
   let url = new db.ShortURL({
     original_url: req.body.url,
-    short_url: shortenedURL.length + 1
-  })
+    short_url: short_url_max + 1
+  });
+
   url.save().then(() => {
     res.json(data);
     console.log(`${data} saved`);
-  }).catch((err) => {
-    res.json({ error: 'Invalid URL' });
-    console.log(`${data} error: ${err.message}`);
-  });
-  shortenedURL.push(data);
+  })
+    .catch((err) => {
+      res.status(500).json({ error: 'Error saving to database' });
+      console.log(`${data} error: ${err.message}`);
+    });
+  // shortenedURL.push(data);
 
 });
 
