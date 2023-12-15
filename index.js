@@ -1,6 +1,5 @@
 require('dotenv').config();
 const express = require('express');
-// const enableCORS = require('./middlewares/cors');
 const app = express();
 const cors = require('cors');
 const dns = require('dns');
@@ -9,8 +8,6 @@ const db = require('./mongodb.js');
 
 // Basic Configuration
 app.use(cors());
-// app.use(bodyparser.urlencoded({ extended: "false" }));
-// app.use(bodyparser.json());
 app.use('/public', express.static(`${process.cwd()}/public`));
 
 let shortenedURL = []
@@ -26,10 +23,7 @@ app.get('/api/hello', (req, res) => {
 
 app.get('/api/shorturl/:short_url?', (req, res) => {
   const { short_url } = req.params;
-  // console.log(short_url);
-  // if (!short_url || short_url === '') {
-  //   res.redirect('back');
-  // }
+
   if (!isNaN(short_url)) {
     const short_url_int = parseInt(short_url);
 
@@ -55,12 +49,12 @@ app.post('/api/shorturl', bodyparser.urlencoded({ extended: "false" }), (req, re
     host = new URL(req.body.url).hostname;
   } catch (err) {
     console.log("error is ", err);
-    return res.status(400).json({ error: "Invalid URL" });
+    return res.json({ error: "invalid url" });
   }
 
   dns.lookup(host, (err) => {
     if (err) {
-      return res.status(400).json({ error: "Invalid URL" });
+      return res.json({ error: "invalid url" });
     } else {
       next();
     }
