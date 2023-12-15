@@ -27,20 +27,21 @@ app.get('/api/hello', (req, res) => {
 app.get('/api/shorturl/:short_url?', async (req, res) => {
   const { short_url } = req.params;
   // console.log(short_url);
-  if (!short_url || short_url === '') {
-    res.redirect('back');
-  }
+  // if (!short_url || short_url === '') {
+  //   res.redirect('back');
+  // }
   if (!isNaN(short_url)) {
     const short_url_int = parseInt(short_url);
 
-    await db.ShortURL.findOne({ short_url: short_url_int }, ((err, data) => {
-      if (err) {
-        console.log(err);
-        return res.status(404);
-      }
-      console.log(data.original_url);
-      res.redirect(data.original_url);
-    }));
+    await db.ShortURL.findOne({ short_url: short_url_int })
+      .then((err, data) => {
+        if (err) {
+          console.log(err);
+          return res.status(404);
+        }
+        console.log(data.original_url);
+        res.redirect(data.original_url);
+      });
 
   } else {
     res.json({ error: 'Wrong format' });
