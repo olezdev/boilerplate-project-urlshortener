@@ -24,7 +24,7 @@ app.get('/api/hello', (req, res) => {
   res.json({ greeting: 'hello API' });
 });
 
-app.get('/api/shorturl/:short_url?', async (req, res) => {
+app.get('/api/shorturl/:short_url?', (req, res) => {
   const { short_url } = req.params;
   // console.log(short_url);
   // if (!short_url || short_url === '') {
@@ -33,7 +33,7 @@ app.get('/api/shorturl/:short_url?', async (req, res) => {
   if (!isNaN(short_url)) {
     const short_url_int = parseInt(short_url);
 
-    await db.ShortURL.findOne({ short_url: short_url_int })
+    db.ShortURL.findOne({ short_url: short_url_int })
       .then((err, data) => {
         if (err) {
           console.log(err);
