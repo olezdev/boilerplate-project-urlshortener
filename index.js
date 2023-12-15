@@ -13,7 +13,7 @@ app.use(bodyparser.urlencoded({ extended: "false" }));
 app.use(bodyparser.json());
 app.use('/public', express.static(`${process.cwd()}/public`));
 
-// let shortenedURL = []
+let shortenedURL = []
 
 app.get('/', (req, res) => {
   res.sendFile(process.cwd() + '/views/index.html');
@@ -46,10 +46,10 @@ app.get('/api/shorturl/:short_url?', (req, res) => {
 });
 
 app.post('/api/shorturl', (req, res, next) => {
-  const { url } = req.body
-  console.log(url);
+  // const { url } = req.body
+  // console.log(url);
 
-  const hostname = new URL(url).hostname;
+  const hostname = new URL(req.body.url).hostname;
   console.log(hostname);
 
   dns.lookup(hostname, (err, address) => {
@@ -59,32 +59,30 @@ app.post('/api/shorturl', (req, res, next) => {
       next();
     }
   });
-}, (req, res) => {
-  const short_url_last = db.ShortURL
+}, async (req, res) => {
+  const short_url_last = await db.ShortURL
     .find()
     .sort({ short_url: -1 })
     .limit(1)
     .select({ original_url: 0 })
-    .exec((err, data) => {
-      if (err) {
-        return console.log(err);
-      }
-      return resolve(data);
+    .then((data) => {
+      console.log(data[0]);
+      console.log(data[0][short_url]);
+      console.log(data[0]['short_url']);
+      return data[0];
+    }).catch((err) => {
+      return console.log(err);
     });
-
-  console.log(short_url_last);
-
-  const last_url = short_url_last[0][short_url];
-
-  console.log(last_url);
+  // const last_url = short_url_last[0]["short_url"];
+  // console.log(last_url);
 
   const data = {
     original_url: req.body.url,
-    short_url: last_url + 1
+    short_url: shortenedURL.length + 1
   };
   let url = new db.ShortURL({
     original_url: req.body.url,
-    short_url: last_url + 1
+    short_url: shortenedURL.length + 1
   });
 
   url.save().then(() => {
@@ -95,7 +93,8 @@ app.post('/api/shorturl', (req, res, next) => {
       res.status(500).json({ error: 'Error saving to database' });
       console.log(`${data} error: ${err.message}`);
     });
-  // shortenedURL.push(data);
+
+  shortenedURL.push(data);
 
 });
 
