@@ -8,12 +8,13 @@ const db = require('./mongodb.js');
 
 // Basic Configuration
 app.use(cors());
-app.use('/public', express.static(`${process.cwd()}/public`));
+// app.use('/public', express.static(`${process.cwd()}/public`));
+app.use(express.static('public'));
 
 let shortenedURL = []
 
 app.get('/', (req, res) => {
-  res.sendFile(process.cwd() + '/views/index.html');
+  res.sendFile(__dirname + '/views/index.html');
 });
 
 // Your first API endpoint
