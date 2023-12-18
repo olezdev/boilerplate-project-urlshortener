@@ -8,7 +8,7 @@ const bodyparser = require('body-parser');
 const db = require('./mongodb.js');
 
 // Basic Configuration
-app.use(cors());
+app.use(cors(enableCORS));
 app.use('/public', express.static(`${process.cwd()}/public`));
 // app.use(express.static(__dirname + '/public'));
 
