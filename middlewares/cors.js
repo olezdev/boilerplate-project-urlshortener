@@ -1,4 +1,4 @@
-const cors = require('cors');
+// const cors = require('cors');
 
 const ACCEPTED_ORIGINS = [
   'http://localhost:1234',
