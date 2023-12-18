@@ -2,14 +2,15 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const enableCORS = require('./middlewares/cors.js');
 const dns = require('dns');
 const bodyparser = require('body-parser');
 const db = require('./mongodb.js');
 
 // Basic Configuration
 app.use(cors());
-// app.use('/public', express.static(`${process.cwd()}/public`));
-app.use(express.static('public'));
+app.use('/public', express.static(`${process.cwd()}/public`));
+// app.use(express.static(__dirname + '/public'));
 
 let shortenedURL = []
 
