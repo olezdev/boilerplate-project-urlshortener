@@ -1,16 +1,18 @@
-require('dotenv').config();
 const express = require('express');
-const app = express();
 const cors = require('cors');
-const enableCORS = require('./middlewares/cors.js');
+// const enableCORS = require('./middlewares/cors.js');
 const dns = require('dns');
 const bodyparser = require('body-parser');
-const db = require('./mongodb.js');
+require('./database/mongodb');
+const ShortURL = require('./models/ShortURL');
+require('dotenv').config();
 
 // Basic Configuration
-app.use(cors(enableCORS));
-app.use('/public', express.static(`${process.cwd()}/public`));
-// app.use(express.static(__dirname + '/public'));
+const app = express();
+app.use(cors());
+
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'public')))
 
 let shortenedURL = []
 
@@ -19,19 +21,15 @@ app.get('/', (req, res) => {
 });
 
 // Your first API endpoint
-app.get('/api/hello', (req, res) => {
-  res.json({ greeting: 'hello API' });
-});
-
 app.get('/api/shorturl/:short_url?', (req, res) => {
   const { short_url } = req.params;
 
   if (!isNaN(short_url)) {
     const short_url_int = parseInt(short_url);
 
-    db.ShortURL.findOne({ short_url: short_url_int })
+    ShortURL.findOne({ short_url: short_url_int })
       .then((url) => {
-        console.log(url.original_url);
+        // console.log(url.original_url);
         res.redirect(url.original_url);
       })
       .catch((err) => {
@@ -62,7 +60,7 @@ app.post('/api/shorturl', bodyparser.urlencoded({ extended: "false" }), (req, re
     }
   });
 }, async (req, res) => {
-  const short_url_last = await db.ShortURL
+  const short_url_last = await ShortURL
     .find()
     .sort({ short_url: -1 })
     .limit(1)
@@ -79,7 +77,7 @@ app.post('/api/shorturl', bodyparser.urlencoded({ extended: "false" }), (req, re
     original_url: req.body.url,
     short_url: short_url_last + 1
   };
-  let url = new db.ShortURL({
+  let url = new ShortURL({
     original_url: req.body.url,
     short_url: short_url_last + 1
   });
